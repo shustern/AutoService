@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>QR-доступ к автосервису</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      background: #f3f4f6;
+      color: #111827;
+      font-family: Arial, sans-serif;
+    }
+    main {
+      width: min(460px, 100%);
+      padding: 32px;
+      text-align: center;
+      background: white;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      box-shadow: 0 12px 35px rgba(17, 24, 39, 0.12);
+    }
+    h1 { margin: 0 0 12px; font-size: 26px; }
+    p { margin: 8px 0 20px; color: #4b5563; line-height: 1.5; }
+    img { width: min(300px, 100%); height: auto; }
+    a {
+      display: block;
+      margin-top: 18px;
+      overflow-wrap: anywhere;
+      color: #075985;
+      font-weight: 700;
+    }
+    small { display: block; margin-top: 18px; color: #6b7280; line-height: 1.45; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Автосервис</h1>
+    <p>Отсканируйте QR-код, чтобы открыть систему с телефона или другого устройства.</p>
+    <img src="{{ url_for('qr_svg') }}" alt="QR-код для открытия системы">
+    <a href="{{ public_url }}">{{ public_url }}</a>
+    <small>QR ведет на публичный адрес приложения.</small>
+  </main>
+</body>
+</html>

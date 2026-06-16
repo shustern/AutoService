@@ -48,11 +48,33 @@ class WorkItem(db.Model):
     standard_hours = db.Column(db.Float, nullable=False)
     hourly_rate = db.Column(db.Float, default=100.0)
 
+class Mechanic(db.Model):
+    __tablename__ = 'mechanics'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    specialization = db.Column(db.String(120), nullable=False)
+    phone = db.Column(db.String(20))
+    active = db.Column(db.Boolean, default=True)
+
+    orders = db.relationship('WorkOrder', backref='mechanic', lazy=True)
+
+class OperationalTask(db.Model):
+    __tablename__ = 'operational_tasks'
+    id = db.Column(db.Integer, primary_key=True)
+    task_key = db.Column(db.String(160), unique=True, nullable=False)
+    task_type = db.Column(db.String(40), nullable=False, default='ops')
+    status = db.Column(db.String(20), nullable=False, default='active')
+    note = db.Column(db.String(300))
+    snoozed_until = db.Column(db.DateTime)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
 class WorkOrder(db.Model):
     __tablename__ = 'work_orders'
     id = db.Column(db.Integer, primary_key=True)
     client_id = db.Column(db.Integer, db.ForeignKey('clients.id'), nullable=False)
     car_id = db.Column(db.Integer, db.ForeignKey('cars.id'), nullable=False)
+    mechanic_id = db.Column(db.Integer, db.ForeignKey('mechanics.id'), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     status = db.Column(db.Enum(OrderStatusEnum), default=OrderStatusEnum.OPEN)
     total_cost = db.Column(db.Float, default=0.0)

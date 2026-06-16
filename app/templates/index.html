@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Auto Service ERP</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body class="locked">
+    <section id="login-screen" class="login-screen">
+        <form id="login-form" class="login-card">
+            <p class="eyebrow">Защищенный вход</p>
+            <h1>Auto Service</h1>
+            <p class="hint">Введите логин и пароль, чтобы открыть локальное приложение автосервиса.</p>
+            <label>Логин<input name="username" autocomplete="username" required></label>
+            <label>Пароль<input name="password" type="password" autocomplete="current-password" required></label>
+            <button class="primary" type="submit">Войти</button>
+            <p class="hint">По умолчанию: admin / autoservice2026</p>
+        </form>
+    </section>
+
+    <header class="topbar">
+        <div>
+            <p class="eyebrow">ERP для малого автосервиса</p>
+            <h1>Auto Service</h1>
+        </div>
+        <div class="topbar-actions">
+            <nav class="tabs" aria-label="Разделы приложения">
+                <button class="tab active" data-section="dashboard">Панель</button>
+                <button class="tab" data-section="orders">Заказы</button>
+                <button class="tab" data-section="clients">Клиенты</button>
+                <button class="tab" data-section="stock">Склад</button>
+                <button class="tab" data-section="works">Работы</button>
+            </nav>
+            <button id="logout-btn" class="ghost" type="button">Выйти</button>
+        </div>
+    </header>
+
+    <main>
+        <section id="dashboard" class="section active">
+            <div class="headline">
+                <div>
+                    <p class="eyebrow">Операционная сводка</p>
+                    <h2>Заказы, склад и эффект цифровизации в одном окне</h2>
+                </div>
+                <button id="refresh-btn" class="primary">Обновить</button>
+            </div>
+
+            <div class="kpi-grid" id="kpi-grid"></div>
+
+            <article class="panel ops-center">
+                <div class="panel-head">
+                    <div>
+                        <p class="eyebrow">Операционный центр</p>
+                        <h3>Что требует внимания сегодня</h3>
+                        <p id="ops-description" class="hint"></p>
+                    </div>
+                    <div class="segmented">
+                        <button class="segment active" data-ops-tab="radar" type="button">Радар</button>
+                        <button class="segment" data-ops-tab="priority" type="button">Мастер</button>
+                        <button class="segment" data-ops-tab="stuck" type="button">Зависшие</button>
+                        <button class="segment" data-ops-tab="maintenance" type="button">ТО</button>
+                    </div>
+                </div>
+                <div id="ops-content" class="ops-content"></div>
+            </article>
+        </section>
+
+        <section id="orders" class="section">
+            <div class="headline">
+                <div>
+                    <p class="eyebrow">Заказ-наряды</p>
+                    <h2>Создание, выполнение и печать документов</h2>
+                </div>
+            </div>
+
+            <div class="split">
+                <form id="order-form" class="panel form">
+                    <h3>Новый заказ</h3>
+                    <label>Клиент<select name="client_id" id="order-client" required></select></label>
+                    <label>Автомобиль<select name="car_id" id="order-car" required></select></label>
+                    <label>Мастер<select name="mechanic_id" id="order-mechanic"></select></label>
+                    <button class="primary" type="submit">Создать заказ</button>
+                    <p class="hint">Автомобиль проверяется по владельцу, чтобы исключить ошибочные заказ-наряды.</p>
+                </form>
+
+                <form id="complaint-form" class="panel form">
+                    <h3>Подбор работ по жалобе</h3>
+                    <label>Жалоба клиента<input name="complaint" placeholder="Например: стук спереди, машина уводит вправо" required></label>
+                    <button class="primary" type="submit">Подобрать работы</button>
+                    <div id="complaint-suggestions" class="suggestions"></div>
+                </form>
+
+                <article class="panel">
+                    <div class="panel-head">
+                        <h3>Список заказов</h3>
+                        <select id="status-filter">
+                            <option value="">Все статусы</option>
+                        </select>
+                    </div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr><th>ID</th><th>Клиент</th><th>Авто</th><th>Мастер</th><th>Статус</th><th>Сумма</th><th></th></tr>
+                            </thead>
+                            <tbody id="orders-table"></tbody>
+                        </table>
+                    </div>
+                </article>
+            </div>
+
+            <article id="order-detail" class="panel order-detail empty">
+                Выберите заказ из списка
+            </article>
+        </section>
+
+        <section id="clients" class="section">
+            <div class="split">
+                <form id="client-form" class="panel form">
+                    <h3>Новый клиент</h3>
+                    <label>ФИО<input name="name" required></label>
+                    <label>Телефон<input name="phone" required></label>
+                    <label>Email<input name="email" type="email"></label>
+                    <button class="primary" type="submit">Добавить клиента</button>
+                </form>
+                <form id="car-form" class="panel form">
+                    <h3>Новый автомобиль</h3>
+                    <label>Клиент<select name="client_id" id="car-client" required></select></label>
+                    <label>Госномер<input name="license_plate" required></label>
+                    <label>Модель<input name="model" required></label>
+                    <label>VIN<input name="vin" maxlength="17"></label>
+                    <label>Год<input name="year" type="number" min="1980" max="2035"></label>
+                    <button class="primary" type="submit">Добавить автомобиль</button>
+                </form>
+            </div>
+
+            <article class="panel">
+                <h3>Клиентская база и автомобили</h3>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr><th>Клиент</th><th>Контакты</th><th>Автомобили</th><th></th></tr>
+                        </thead>
+                        <tbody id="clients-cars-table"></tbody>
+                    </table>
+                </div>
+            </article>
+
+            <article id="car-health-panel" class="panel car-health hidden">
+                <h3>Медкарта автомобиля</h3>
+                <div id="car-health-content"></div>
+            </article>
+        </section>
+
+        <section id="stock" class="section">
+            <div class="split">
+                <form id="part-form" class="panel form">
+                    <h3>Новая запчасть</h3>
+                    <label>Название<input name="name" required></label>
+                    <label>Артикул<input name="sku" required></label>
+                    <label>Цена<input name="price" type="number" min="0" step="0.01" required></label>
+                    <label>Остаток<input name="quantity_in_stock" type="number" min="0" step="0.1" required></label>
+                    <button class="primary" type="submit">Добавить на склад</button>
+                </form>
+                <article class="panel">
+                    <h3>Склад запчастей</h3>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr><th>Название</th><th>Артикул</th><th>Цена</th><th>Остаток</th><th></th></tr>
+                            </thead>
+                            <tbody id="parts-table"></tbody>
+                        </table>
+                    </div>
+                </article>
+            </div>
+
+            <article class="panel">
+                <h3>Прогноз дефицита запчастей</h3>
+                <div id="parts-forecast" class="compact-list columns"></div>
+            </article>
+        </section>
+
+        <section id="works" class="section">
+            <div class="split">
+                <form id="work-form" class="panel form">
+                    <h3>Новая работа</h3>
+                    <label>Название<input name="name" required></label>
+                    <label>Нормо-часы<input name="standard_hours" type="number" min="0.1" step="0.1" required></label>
+                    <label>Ставка<input name="hourly_rate" type="number" min="0" step="10" required></label>
+                    <button class="primary" type="submit">Добавить работу</button>
+                </form>
+                <form id="mechanic-form" class="panel form">
+                    <h3>Новый мастер</h3>
+                    <label>ФИО<input name="name" required></label>
+                    <label>Специализация<input name="specialization" required></label>
+                    <label>Телефон<input name="phone"></label>
+                    <button class="primary" type="submit">Добавить мастера</button>
+                </form>
+                <article class="panel">
+                    <h3>Справочник работ</h3>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr><th>Работа</th><th>Нормо-часы</th><th>Ставка</th><th></th></tr>
+                            </thead>
+                            <tbody id="works-table"></tbody>
+                        </table>
+                    </div>
+                </article>
+                <article class="panel">
+                    <h3>Мастера</h3>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr><th>Мастер</th><th>Специализация</th><th>Телефон</th><th></th></tr>
+                            </thead>
+                            <tbody id="mechanics-table"></tbody>
+                        </table>
+                    </div>
+                </article>
+            </div>
+        </section>
+    </main>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
